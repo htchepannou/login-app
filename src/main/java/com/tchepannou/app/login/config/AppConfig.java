@@ -1,9 +1,10 @@
 package com.tchepannou.app.login.config;
 
+import com.tchepannou.app.login.service.HttpFactory;
+import com.tchepannou.app.login.service.impl.HttpFactoryImpl;
+import com.tchepannou.app.login.service.impl.LoginCommand;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.tchepannou.app.login.service.GreetingService;
-import com.tchepannou.app.login.service.impl.GreetingServiceImpl;
 
 /**
  * Declare your services here!
@@ -11,7 +12,12 @@ import com.tchepannou.app.login.service.impl.GreetingServiceImpl;
 @Configuration
 public class AppConfig {
     @Bean
-    GreetingService greetingService (){
-        return new GreetingServiceImpl();
+    HttpFactory httpFactory(){
+        return new HttpFactoryImpl();
+    }
+
+    @Bean
+    LoginCommand loginCommand(){
+        return new LoginCommand();
     }
 }
