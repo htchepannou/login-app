@@ -1,4 +1,4 @@
-package com.tchepannou.app.login.client.v1;
+package com.tchepannou.app.login.client.v1.login;
 
 import org.hibernate.validator.constraints.NotBlank;
 

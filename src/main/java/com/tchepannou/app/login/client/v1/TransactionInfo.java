@@ -1,25 +1,26 @@
 package com.tchepannou.app.login.client.v1;
 
 import java.util.Date;
-import java.util.UUID;
 
 public class TransactionInfo {
-    private String transactionId = UUID.randomUUID().toString();
-    private Date dateTime = new Date();
+    private String transactionId;
+    private Date dateTime;
 
     public String getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId) {
+    public TransactionInfo withTransactionId(String transactionId) {
         this.transactionId = transactionId;
+        return this;
     }
 
     public Date getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public TransactionInfo withDateTime(Date dateTime) {
         this.dateTime = dateTime;
+        return this;
     }
 }

@@ -1,12 +1,14 @@
-package com.tchepannou.app.login.service.impl;
+package com.tchepannou.app.login.service.login;
 
-import com.tchepannou.app.login.client.v1.AppLoginRequest;
-import com.tchepannou.app.login.client.v1.AppLoginResponse;
 import com.tchepannou.app.login.client.v1.AppErrors;
-import com.tchepannou.app.login.client.v1.TransactionInfo;
+import com.tchepannou.app.login.client.v1.Constants;
+import com.tchepannou.app.login.client.v1.login.AppLoginRequest;
+import com.tchepannou.app.login.client.v1.login.AppLoginResponse;
 import com.tchepannou.app.login.exception.LoginException;
-import com.tchepannou.app.login.service.Command;
+import com.tchepannou.app.login.service.CommandContext;
 import com.tchepannou.app.login.service.HttpFactory;
+import com.tchepannou.app.login.service.LoginCommand;
+import com.tchepannou.app.login.service.impl.AbstractCommand;
 import com.tchepannou.auth.client.v1.AccessTokenResponse;
 import com.tchepannou.core.http.Http;
 import com.tchepannou.core.http.HttpException;
@@ -22,12 +24,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.IOException;
 
 @Scope(value = WebApplicationContext.SCOPE_REQUEST)
-public class LoginCommand implements Command<AppLoginRequest, AppLoginResponse> {
+public class LoginCommandImpl extends AbstractCommand<AppLoginRequest, AppLoginResponse> implements LoginCommand {
     //-- Attributes
-    private static final Logger LOG = LoggerFactory.getLogger(LoginCommand.class);
-
-    @Autowired
-    private HttpFactory httpFactory;
+    private static final Logger LOG = LoggerFactory.getLogger(LoginCommandImpl.class);
 
     @Value("${auth.hostname}")
     private String authHostname;
@@ -35,21 +34,21 @@ public class LoginCommand implements Command<AppLoginRequest, AppLoginResponse> 
     @Value("${auth.port}")
     private int authPort;
 
+    @Autowired
+    private HttpFactory httpFactory;
+
+
     //-- Command overrides
     @Override
-    public AppLoginResponse execute(AppLoginRequest request) throws IOException {
-        TransactionInfo tx = newTransactionInfo();
-
+    protected
+    AppLoginResponse doExecute(AppLoginRequest request, CommandContext context) throws IOException {
         try (CloseableHttpClient client = httpFactory.newHttpClient()) {
 
-            Http http = newHttp(tx, client);
+            Http http = newHttp(client);
 
             AccessTokenResponse accessToken = login(request, http);
 
-            AppLoginResponse response = new AppLoginResponse();
-            response.setAccessToken(accessToken);
-            response.setTransactionInfo(tx);
-            return response;
+            return new AppLoginResponse(getTransactionInfo(), accessToken);
 
         } catch (HttpException e){
             final int status = e.getStatus();
@@ -60,6 +59,11 @@ public class LoginCommand implements Command<AppLoginRequest, AppLoginResponse> 
                 throw e;
             }
         }
+    }
+
+    @Override
+    protected String getMetricName() {
+        return Constants.METRIC_LOGIN;
     }
 
 
@@ -76,14 +80,10 @@ public class LoginCommand implements Command<AppLoginRequest, AppLoginResponse> 
         ;
     }
 
-    private Http newHttp (final TransactionInfo tx, final HttpClient client){
+    private Http newHttp (final HttpClient client){
         return httpFactory
                 .newHttp(client)
-                .header(Http.HEADER_TRANSACTION_ID, tx.getTransactionId())
-        ;
-    }
-
-    private TransactionInfo newTransactionInfo (){
-        return new TransactionInfo();
+                .header(Http.HEADER_TRANSACTION_ID, getTransactionInfo().getTransactionId())
+                ;
     }
 }

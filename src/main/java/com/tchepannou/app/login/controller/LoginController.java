@@ -1,15 +1,15 @@
 package com.tchepannou.app.login.controller;
 
-import com.tchepannou.app.login.client.v1.AppLoginRequest;
-import com.tchepannou.app.login.client.v1.AppLoginResponse;
+import com.tchepannou.app.login.client.v1.login.AppLoginRequest;
+import com.tchepannou.app.login.client.v1.login.AppLoginResponse;
 import com.tchepannou.app.login.exception.LoginException;
-import com.tchepannou.app.login.service.impl.LoginCommand;
+import com.tchepannou.app.login.service.LoginCommand;
+import com.tchepannou.auth.client.v1.AuthConstants;
 import com.tchepannou.core.client.v1.ErrorResponse;
-import com.tchepannou.core.http.Http;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,12 +25,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
-@Api(basePath = "/v1/login", value = "Greeting", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequestMapping(value="/v1/app/login", produces = MediaType.APPLICATION_JSON_VALUE)
-public class LoginController {
+@Api(basePath = "/v1/is/login", value = "Greeting", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/v1/is/login", produces = MediaType.APPLICATION_JSON_VALUE)
+public class LoginController extends AbstractController {
     //-- Attributes
-    private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
-
     @Autowired
     private LoginCommand loginCommand;
 
@@ -38,8 +36,14 @@ public class LoginController {
     //-- REST methods
     @RequestMapping(method = RequestMethod.POST)
     @ApiOperation("Authenticate a user")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success"),
+            @ApiResponse(code = 409, message = AuthConstants.ERROR_AUTH_FAILED),
+    })
     public AppLoginResponse login(@Valid @RequestBody AppLoginRequest request) throws IOException {
-        return loginCommand.execute(request);
+        return loginCommand.execute(request,
+                new CommandContextImpl()
+        );
     }
 
 
@@ -47,7 +51,7 @@ public class LoginController {
     @ResponseStatus(value= HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(LoginException.class)
     public ErrorResponse authFailed (LoginException exception, HttpServletRequest request){
-        LOG.error("Authentication failed", exception);
+        getLogger().error("Authentication failed", exception);
 
         return createErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), request);
     }
@@ -55,17 +59,8 @@ public class LoginController {
     @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse failure(final Exception exception, final HttpServletRequest request) {
-        LOG.error("Unexpected error", exception);
+        getLogger().error("Unexpected error", exception);
 
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), request);
-    }
-
-
-    protected ErrorResponse createErrorResponse(int code, String text, HttpServletRequest request){
-        return new ErrorResponse()
-                .withCode(code)
-                .withText(text)
-                .withAccessTokenId(request.getHeader(Http.HEADER_ACCESS_TOKEN))
-                .withTransactionId(request.getHeader(Http.HEADER_TRANSACTION_ID));
     }
 }
