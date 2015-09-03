@@ -9,8 +9,6 @@ import com.tchepannou.app.login.service.impl.AbstractCommand;
 import com.tchepannou.auth.client.v1.AccessTokenResponse;
 import com.tchepannou.core.http.Http;
 import com.tchepannou.core.http.HttpException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.context.WebApplicationContext;
@@ -20,8 +18,6 @@ import java.io.IOException;
 @Scope(value = WebApplicationContext.SCOPE_REQUEST)
 public class LoginCommand extends AbstractCommand<AppLoginRequest, AppLoginResponse> {
     //-- Attributes
-    private static final Logger LOG = LoggerFactory.getLogger(LoginCommand.class);
-
     @Value("${auth.hostname}")
     private String authHostname;
 
