@@ -1,5 +1,6 @@
 package com.tchepannou.app.login.controller;
 
+import com.tchepannou.app.login.exception.AuthenticationException;
 import com.tchepannou.core.client.v1.ErrorResponse;
 import com.tchepannou.core.http.Http;
 import org.slf4j.Logger;
@@ -32,6 +33,15 @@ public class AbstractController {
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), request);
     }
 
+    @ResponseStatus(value= HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthenticationException.class)
+    public ErrorResponse authFailed(final AuthenticationException exception, final HttpServletRequest request) {
+        getLogger().error("{} - Unable to authenticate the user", request.getRequestURI(), exception);
+
+        return createErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), request);
+    }
+
+    //-- Protected
     protected ErrorResponse createErrorResponse(int code, String text, HttpServletRequest request){
         return new ErrorResponse()
                 .withCode(code)

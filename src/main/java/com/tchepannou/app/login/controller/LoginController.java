@@ -3,7 +3,7 @@ package com.tchepannou.app.login.controller;
 import com.tchepannou.app.login.client.v1.login.AppLoginRequest;
 import com.tchepannou.app.login.client.v1.login.AppLoginResponse;
 import com.tchepannou.app.login.exception.LoginException;
-import com.tchepannou.app.login.service.LoginCommand;
+import com.tchepannou.app.login.service.login.LoginCommand;
 import com.tchepannou.auth.client.v1.AuthConstants;
 import com.tchepannou.core.client.v1.ErrorResponse;
 import com.wordnik.swagger.annotations.Api;
@@ -25,8 +25,8 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
-@Api(basePath = "/v1/is/login", value = "Greeting", produces = MediaType.APPLICATION_JSON_VALUE)
-@RequestMapping(value="/v1/is/login", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(basePath = "/v1/app/login", value = "Greeting", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/v1/app/login", produces = MediaType.APPLICATION_JSON_VALUE)
 public class LoginController extends AbstractController {
     //-- Attributes
     @Autowired
