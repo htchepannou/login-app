@@ -7,7 +7,6 @@ import com.tchepannou.app.login.exception.LoginException;
 import com.tchepannou.app.login.service.CommandContext;
 import com.tchepannou.app.login.service.impl.AbstractCommand;
 import com.tchepannou.auth.client.v1.AccessTokenResponse;
-import com.tchepannou.core.http.Http;
 import com.tchepannou.core.http.HttpException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -29,12 +28,10 @@ public class LoginCommand extends AbstractCommand<AppLoginRequest, AppLoginRespo
     @Override
     protected AppLoginResponse doExecute(AppLoginRequest request, CommandContext context) throws IOException {
         try {
-            Http http = newHttp(getHttpClient());
-
-            AccessTokenResponse accessToken =  http
+            AccessTokenResponse accessToken = getHttp()
                     .withPort(authPort)
                     .withHost(authHostname)
-                    .withPath("/v1/auth/login")
+                    .withPath(Constants.URI_AUTH + "login")
                     .withPayload(request)
                     .post(AccessTokenResponse.class)
             ;

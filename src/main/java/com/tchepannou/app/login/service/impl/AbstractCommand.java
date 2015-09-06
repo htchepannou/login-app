@@ -5,13 +5,10 @@ import com.codahale.metrics.Timer;
 import com.tchepannou.app.login.client.v1.TransactionInfo;
 import com.tchepannou.app.login.service.Command;
 import com.tchepannou.app.login.service.CommandContext;
-import com.tchepannou.app.login.service.HttpFactory;
 import com.tchepannou.core.http.Http;
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.util.Date;
@@ -22,10 +19,12 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
     private MetricRegistry metrics;
 
     @Autowired
-    private HttpFactory httpFactory;
+    private HttpClient httpClient;
 
-    private CloseableHttpClient httpClient;
+    @Autowired
+    private Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder;
 
+    private Http http;
     private TransactionInfo transactionInfo;
 
 
@@ -42,21 +41,18 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
         try {
             metrics.meter(metricName).mark();
 
-            this.httpClient = httpFactory.newHttpClient();
-            try {
-                this.transactionInfo = newTransactionInfo(context);
+            this.transactionInfo = newTransactionInfo(context);
+            getHttp().header(Http.HEADER_TRANSACTION_ID, transactionInfo.getTransactionId());
 
-                /* pre */
-                authenticate(context);
+            /* pre */
+            authenticate(context);
 
-                /* execute */
-                O response = doExecute(request, context);
+            /* execute */
+            O response = doExecute(request, context);
 
-                /* post */
-                return response;
-            } finally {
-                httpClient.close();
-            }
+            /* post */
+            return response;
+
         } catch (RuntimeException e) {
             metrics.meter(metricName + "-errors").mark();
 
@@ -67,10 +63,6 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
     }
 
     //-- Protected
-    protected Logger getLogger () {
-        return LoggerFactory.getLogger(getClass());
-    }
-
     protected TransactionInfo getTransactionInfo (){
         return transactionInfo;
     }
@@ -78,15 +70,15 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
     protected void authenticate (CommandContext context) throws IOException {
     }
 
-    protected HttpClient getHttpClient () {
-        return httpClient;
-    }
-
-    protected Http newHttp (final HttpClient client){
-        return httpFactory
-                .newHttp(client)
-                .header(Http.HEADER_TRANSACTION_ID, getTransactionInfo().getTransactionId())
-        ;
+    protected Http getHttp (){
+        if (http == null){
+            return new Http()
+                    .withHttpClient(httpClient)
+                    .header(Http.HEADER_TRANSACTION_ID, transactionInfo.getTransactionId())
+                    .withObjectMapper(jackson2ObjectMapperBuilder.build())
+            ;
+        }
+        return http;
     }
 
     //-- Private

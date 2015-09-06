@@ -1,6 +1,8 @@
 package com.tchepannou.app.login.controller;
 
+import com.tchepannou.app.login.client.v1.Constants;
 import com.tchepannou.app.login.exception.AuthenticationException;
+import com.tchepannou.app.login.exception.NotFoundException;
 import com.tchepannou.core.client.v1.ErrorResponse;
 import com.tchepannou.core.http.Http;
 import org.slf4j.Logger;
@@ -12,13 +14,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.http.HTTPException;
 import java.util.List;
 
 public class AbstractController {
     //-- Exception Handler
     @ResponseStatus(value= HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorResponse validationFailed(final MethodArgumentNotValidException ex, final HttpServletRequest request) {
+    public ErrorResponse validationError(final MethodArgumentNotValidException ex, final HttpServletRequest request) {
         getLogger().error("[] = Validation error", request.getRequestURI(), ex);
 
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
@@ -27,7 +30,7 @@ public class AbstractController {
 
     @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ErrorResponse failure(final Exception exception, final HttpServletRequest request) {
+    public ErrorResponse serverError(final Exception exception, final HttpServletRequest request) {
         getLogger().error("{} - Unexpected error.", request.getRequestURI(), exception);
 
         return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage(), request);
@@ -35,10 +38,26 @@ public class AbstractController {
 
     @ResponseStatus(value= HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AuthenticationException.class)
-    public ErrorResponse authFailed(final AuthenticationException exception, final HttpServletRequest request) {
+    public ErrorResponse authError(final AuthenticationException exception, final HttpServletRequest request) {
         getLogger().error("{} - Unable to authenticate the user", request.getRequestURI(), exception);
 
         return createErrorResponse(HttpStatus.UNAUTHORIZED.value(), exception.getMessage(), request);
+    }
+
+    @ResponseStatus(value= HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    public ErrorResponse notFoundError(final NotFoundException exception, final HttpServletRequest request) {
+        getLogger().error("{} - Not found", request.getRequestURI(), exception);
+
+        return createErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage(), request);
+    }
+
+    @ResponseStatus(value= HttpStatus.CONFLICT)
+    @ExceptionHandler(HTTPException.class)
+    public ErrorResponse httpError(final HTTPException exception, final HttpServletRequest request) {
+        getLogger().error("{} - Downstream error", request.getRequestURI(), exception);
+
+        return createErrorResponse(HttpStatus.CONFLICT.value(), Constants.ERROR_IO, request);
     }
 
     //-- Protected

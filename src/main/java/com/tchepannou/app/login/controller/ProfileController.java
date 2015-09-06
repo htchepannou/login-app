@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@Api(basePath = "/v1/app/profile", value = "Greeting", produces = MediaType.APPLICATION_JSON_VALUE)
+@Api(basePath = "/v1/app/profile", value = "Manage User Profile", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequestMapping(value="/v1/app/profile", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProfileController extends AbstractController {
     @Autowired
@@ -29,7 +29,7 @@ public class ProfileController extends AbstractController {
     @ApiOperation("Returns user profile")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 404, message = Constants.ERROR_NOT_FOUND),
             @ApiResponse(code = 401, message = Constants.ERROR_AUTH_FAILED),
     })
     public AppProfileResponse me(

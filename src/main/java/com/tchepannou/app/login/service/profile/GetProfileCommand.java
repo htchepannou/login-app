@@ -2,10 +2,9 @@ package com.tchepannou.app.login.service.profile;
 
 import com.tchepannou.app.login.client.v1.Constants;
 import com.tchepannou.app.login.client.v1.profile.AppProfileResponse;
-import com.tchepannou.app.login.exception.LoginException;
+import com.tchepannou.app.login.exception.NotFoundException;
 import com.tchepannou.app.login.service.CommandContext;
 import com.tchepannou.app.login.service.impl.AbstractSecuredCommand;
-import com.tchepannou.core.http.Http;
 import com.tchepannou.core.http.HttpException;
 import com.tchepannou.party.client.v1.PartyResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +26,10 @@ public class GetProfileCommand extends AbstractSecuredCommand<Void, AppProfileRe
     @Override
     protected AppProfileResponse doExecute(Void request, CommandContext context) throws IOException {
         try {
-            Http http = newHttp(getHttpClient());
-
-            PartyResponse party = http
+            PartyResponse party = getHttp()
                     .withPort(partyPort)
                     .withHost(partyHostname)
-                    .withPath("/v1/party/" + getUserId ())
+                    .withPath(Constants.URI_PARTY + getUserId ())
                     .withPayload(request)
                     .get(PartyResponse.class)
             ;
@@ -41,8 +38,8 @@ public class GetProfileCommand extends AbstractSecuredCommand<Void, AppProfileRe
         } catch (HttpException e){
             final int status = e.getStatus();
 
-            if (status == 409){
-                throw new LoginException(Constants.ERROR_AUTH_FAILED, e);
+            if (status == 404){
+                throw new NotFoundException(Constants.ERROR_NOT_FOUND, e);
             } else {
                 throw e;
             }
@@ -51,6 +48,6 @@ public class GetProfileCommand extends AbstractSecuredCommand<Void, AppProfileRe
 
     @Override
     protected String getMetricName() {
-        return Constants.METRIC_GET_PROFILE;
+        return Constants.METRIC_PROFILE_GET;
     }
 }

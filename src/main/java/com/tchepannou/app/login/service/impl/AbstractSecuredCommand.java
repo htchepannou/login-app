@@ -1,5 +1,6 @@
 package com.tchepannou.app.login.service.impl;
 
+import com.tchepannou.app.login.client.v1.Constants;
 import com.tchepannou.app.login.exception.AuthenticationException;
 import com.tchepannou.app.login.service.CommandContext;
 import com.tchepannou.auth.client.v1.AccessTokenResponse;
@@ -21,10 +22,10 @@ public abstract class AbstractSecuredCommand<I, O> extends AbstractCommand<I, O>
     @Override
     protected void authenticate(CommandContext context) {
         try {
-            this.accessToken = newHttp(getHttpClient())
+            this.accessToken = getHttp()
                     .withHost(authHostname)
                     .withPort(authPort)
-                    .withPath("/v1/access_token/" + context.getAccessTokenId())
+                    .withPath(Constants.URI_ACCESS_TOKEN + context.getAccessTokenId())
                     .get(AccessTokenResponse.class)
             ;
         } catch (IOException e) {
