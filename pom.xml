@@ -23,6 +23,11 @@
             <artifactId>party-client</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.tchepannou.blog</groupId>
+            <artifactId>blog-client</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>

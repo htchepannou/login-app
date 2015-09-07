@@ -1,8 +1,11 @@
 package com.tchepannou.app.login.config;
 
+import com.tchepannou.app.login.service.blog.GetMyPostsCommand;
+import com.tchepannou.app.login.service.blog.GetTeamPostsCommand;
 import com.tchepannou.app.login.service.login.LoginCommand;
 import com.tchepannou.app.login.service.login.LogoutCommand;
 import com.tchepannou.app.login.service.profile.GetProfileCommand;
+import com.tchepannou.app.login.service.team.GetTeamProfile;
 import com.tchepannou.app.login.service.team.MyTeamsCommand;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
@@ -56,5 +59,20 @@ public class AppConfig {
     @Bean
     MyTeamsCommand myTeamsCommand(){
         return new MyTeamsCommand();
+    }
+
+    @Bean
+    GetTeamProfile getTeamProfile() {
+        return new GetTeamProfile();
+    }
+
+    @Bean
+    GetMyPostsCommand getMyPostsCommand() {
+        return new GetMyPostsCommand();
+    }
+
+    @Bean
+    GetTeamPostsCommand getTeamPostsCommand (){
+        return new GetTeamPostsCommand();
     }
 }

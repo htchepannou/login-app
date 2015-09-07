@@ -48,6 +48,6 @@ public class GetProfileCommand extends AbstractSecuredCommand<Void, AppProfileRe
 
     @Override
     protected String getMetricName() {
-        return Constants.METRIC_PROFILE_GET;
+        return Constants.METRIC_MY_PROFILE;
     }
 }

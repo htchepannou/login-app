@@ -26,8 +26,7 @@ public class MyTeamsCommand extends AbstractSecuredCommand<Void, AppTeamCollecti
         PartyCollectionResponse party = getHttp()
                 .withPort(partyPort)
                 .withHost(partyHostname)
-                .withPath(Constants.URI_PARTY + "/from/" + getUserId () + "/relation/member")
-                .withPayload(request)
+                .withPath(Constants.URI_PARTY + "/from/" + getUserId() + "/relation/member")
                 .get(PartyCollectionResponse.class)
         ;
         return new AppTeamCollectionResponse(getTransactionInfo(), party);
@@ -35,6 +34,6 @@ public class MyTeamsCommand extends AbstractSecuredCommand<Void, AppTeamCollecti
 
     @Override
     protected String getMetricName() {
-        return Constants.METRIC_TEAM_MY;
+        return Constants.METRIC_MY_TEAMS;
     }
 }

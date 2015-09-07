@@ -26,7 +26,7 @@ public class ProfileController extends AbstractController {
 
     //-- REST methods
     @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation("Returns user profile")
+    @ApiOperation("Returns current user profile")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Success"),
             @ApiResponse(code = 404, message = Constants.ERROR_NOT_FOUND),

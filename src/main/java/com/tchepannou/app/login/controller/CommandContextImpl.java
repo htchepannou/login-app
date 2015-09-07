@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class CommandContextImpl implements CommandContext {
     //-- Attributes
+    private long id;
     private String accessTokenId;
     private String transactionId = UUID.randomUUID().toString();
     private int limit;
@@ -14,6 +15,11 @@ public class CommandContextImpl implements CommandContext {
     //-- Public
     public CommandContextImpl withAccessTokenId(String id){
         this.accessTokenId = id;
+        return this;
+    }
+
+    public CommandContextImpl withId (Long id){
+        this.id = id;
         return this;
     }
 
@@ -34,6 +40,11 @@ public class CommandContextImpl implements CommandContext {
     //-- CommandContext overrides
     @Override public String getAccessTokenId() {
         return accessTokenId;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.http.HTTPException;
+import java.io.IOException;
 import java.util.List;
 
 public class AbstractController {
@@ -56,6 +57,14 @@ public class AbstractController {
     @ExceptionHandler(HTTPException.class)
     public ErrorResponse httpError(final HTTPException exception, final HttpServletRequest request) {
         getLogger().error("{} - Downstream error", request.getRequestURI(), exception);
+
+        return createErrorResponse(HttpStatus.CONFLICT.value(), Constants.ERROR_IO, request);
+    }
+
+    @ResponseStatus(value= HttpStatus.CONFLICT)
+    @ExceptionHandler(IOException.class)
+    public ErrorResponse ioError(final HTTPException exception, final HttpServletRequest request) {
+        getLogger().error("{} - IO error", request.getRequestURI(), exception);
 
         return createErrorResponse(HttpStatus.CONFLICT.value(), Constants.ERROR_IO, request);
     }
