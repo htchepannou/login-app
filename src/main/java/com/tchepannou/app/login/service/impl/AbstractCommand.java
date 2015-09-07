@@ -31,15 +31,12 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
     //-- Abstract
     protected abstract O doExecute (I request, CommandContext context) throws IOException;
 
-    protected abstract String getMetricName ();
-
     //-- Command Override
     @Override
     public O execute(I request, CommandContext context) throws IOException {
-        final String metricName = getMetricName();
-        final Timer.Context timer = metrics.timer(metricName + "-duration").time();
+        final Timer.Context timer = metrics.timer(MetricRegistry.name(getClass(), "duration")).time();
         try {
-            metrics.meter(metricName).mark();
+            metrics.meter(MetricRegistry.name(getClass(), "count")).mark();
 
             this.transactionInfo = newTransactionInfo(context);
             getHttp().header(Http.HEADER_TRANSACTION_ID, transactionInfo.getTransactionId());
@@ -54,7 +51,7 @@ public abstract class AbstractCommand<I, O> implements Command<I, O> {
             return response;
 
         } catch (RuntimeException e) {
-            metrics.meter(metricName + "-errors").mark();
+            metrics.meter(MetricRegistry.name(getClass(), "errors")).mark();
 
             throw e;
         } finally {

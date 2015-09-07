@@ -40,9 +40,4 @@ public class GetTeamProfile extends AbstractSecuredCommand<Void, AppTeamResponse
             }
         }
     }
-
-    @Override
-    protected String getMetricName() {
-        return Constants.METRIC_GET_TEAM;
-    }
 }

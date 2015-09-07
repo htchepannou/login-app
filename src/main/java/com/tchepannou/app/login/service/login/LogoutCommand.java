@@ -32,9 +32,4 @@ public class LogoutCommand extends AbstractSecuredCommand<Void, Void> {
 
         return null;
     }
-
-    @Override
-    protected String getMetricName() {
-        return Constants.METRIC_LOGOUT;
-    }
 }

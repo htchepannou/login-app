@@ -31,9 +31,4 @@ public class MyTeamsCommand extends AbstractSecuredCommand<Void, AppTeamCollecti
         ;
         return new AppTeamCollectionResponse(getTransactionInfo(), party);
     }
-
-    @Override
-    protected String getMetricName() {
-        return Constants.METRIC_MY_TEAMS;
-    }
 }

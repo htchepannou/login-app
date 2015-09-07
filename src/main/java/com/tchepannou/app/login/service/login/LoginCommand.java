@@ -48,9 +48,4 @@ public class LoginCommand extends AbstractCommand<AppLoginRequest, AppLoginRespo
             }
         }
     }
-
-    @Override
-    protected String getMetricName() {
-        return Constants.METRIC_LOGIN;
-    }
 }

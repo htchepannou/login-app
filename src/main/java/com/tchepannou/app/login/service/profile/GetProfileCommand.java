@@ -29,25 +29,19 @@ public class GetProfileCommand extends AbstractSecuredCommand<Void, AppProfileRe
             PartyResponse party = getHttp()
                     .withPort(partyPort)
                     .withHost(partyHostname)
-                    .withPath(Constants.URI_PARTY + getUserId ())
+                    .withPath(Constants.URI_PARTY + getUserId())
                     .withPayload(request)
-                    .get(PartyResponse.class)
-            ;
+                    .get(PartyResponse.class);
             return new AppProfileResponse(getTransactionInfo(), party);
 
-        } catch (HttpException e){
+        } catch (HttpException e) {
             final int status = e.getStatus();
 
-            if (status == 404){
+            if (status == 404) {
                 throw new NotFoundException(Constants.ERROR_NOT_FOUND, e);
             } else {
                 throw e;
             }
         }
-    }
-
-    @Override
-    protected String getMetricName() {
-        return Constants.METRIC_MY_PROFILE;
     }
 }

@@ -16,11 +16,6 @@ public class GetMyPostsCommand extends AbstractSearchPostCommand {
 
     //-- AbstractSearchPostCommand overrides
     @Override
-    protected String getMetricName() {
-        return Constants.METRIC_MY_DASHBOARD;
-    }
-
-    @Override
     protected List<Long> getTeamIds (CommandContext context) throws IOException {
         return getHttp()
                 .withPort(getPartyPort())
